@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Camping — Plaża Patelnia | Cennik i kalkulator kosztów pola namiotowego</title>
+  <meta name="description" content="Pole namiotowe i kemping nad jeziorem w Grabinie k. Płocka. Pełny cennik oraz interaktywny kalkulator kosztów pobytu. Plaża Patelnia." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ---- pasek z przełącznikiem kalkulatora ---- */
+    .calc-toggle-bar { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:20px; background:#fff; border:1px solid var(--line); border-radius:var(--radius-lg); padding:24px 28px; box-shadow:var(--shadow-sm); margin-bottom:36px; position:relative; overflow:hidden; }
+    .calc-toggle-bar::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:5px; background:linear-gradient(var(--gold),var(--gold-dk)); }
+    .calc-toggle-bar .ctb-text h2 { font-size:1.4rem; font-weight:800; }
+    .calc-toggle-bar .ctb-text p { color:var(--muted); font-size:.92rem; margin-top:4px; max-width:520px; }
+    .calc-toggle-btn { display:inline-flex; align-items:center; gap:13px; background:var(--navy); color:#fff; border:0; border-radius:50px; padding:15px 24px; font-family:'Montserrat',sans-serif; font-weight:700; font-size:.95rem; cursor:pointer; transition:background .3s var(--ease), transform .3s var(--ease), box-shadow .3s; white-space:nowrap; }
+    .calc-toggle-btn:hover { transform:translateY(-2px); box-shadow:var(--shadow-md); }
+    .calc-toggle-btn.active { background:var(--gold); color:var(--navy); box-shadow:0 10px 24px rgba(245,200,66,.45); }
+    .calc-toggle-btn .ctb-on{ display:none; } .calc-toggle-btn.active .ctb-off{ display:none; } .calc-toggle-btn.active .ctb-on{ display:inline; }
+    .toggle-sw { width:46px; height:26px; border-radius:50px; background:rgba(255,255,255,.25); position:relative; transition:background .3s; flex-shrink:0; }
+    .calc-toggle-btn.active .toggle-sw { background:rgba(13,34,64,.25); }
+    .toggle-th { position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:50%; background:#fff; transition:left .3s var(--ease); }
+    .calc-toggle-btn.active .toggle-th { left:23px; }
+
+    /* ---- układ cennik + panel ---- */
+    .cennik-body { display:grid; grid-template-columns:1fr; gap:32px; align-items:start; }
+    #cennik.calc-mode .cennik-body { grid-template-columns:1fr 380px; }
+    @media(max-width:1024px){ #cennik.calc-mode .cennik-body{ grid-template-columns:1fr; } }
+
+    .cennik-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:22px; }
+    @media(max-width:680px){ .cennik-grid{ grid-template-columns:1fr; } }
+    .cennik-card { background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:26px; box-shadow:var(--shadow-sm); position:relative; overflow:hidden; transition:box-shadow .3s, transform .3s var(--ease); }
+    .cennik-card::before { content:""; position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(to right,var(--gold),var(--gold-lt)); transform:scaleX(0); transform-origin:left; transition:transform .4s var(--ease); }
+    .cennik-card:hover { transform:translateY(-3px); box-shadow:var(--shadow-md); }
+    .cennik-card:hover::before { transform:scaleX(1); }
+    .cennik-card-full{ grid-column:1 / -1; }
+    .cennik-card-top { display:flex; align-items:center; gap:13px; margin-bottom:14px; }
+    .cennik-card-icon { width:46px;height:46px;border-radius:12px;background:var(--blue-lt);display:grid;place-items:center;color:var(--navy);flex-shrink:0; }
+    .cennik-card-title { font-size:1.12rem; font-weight:700; }
+    .cennik-list { list-style:none; display:flex; flex-direction:column; }
+    .cennik-list li { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0; border-bottom:1px solid var(--line); }
+    .cennik-list li:last-child{ border-bottom:0; }
+    .item-name{ font-size:.95rem; }
+    .item-right{ display:flex; align-items:center; gap:16px; }
+    .price{ font-family:'Montserrat',sans-serif; font-weight:700; color:var(--navy); white-space:nowrap; }
+    .price.free{ color:#15803d; }
+    .item-stepper{ display:none; align-items:center; gap:9px; background:var(--blue-lt); border-radius:50px; padding:4px; }
+    .calc-mode .item-stepper{ display:inline-flex; }
+    .step-btn{ width:28px;height:28px;border-radius:50%;border:0;background:#fff;color:var(--navy);font-size:1.15rem;font-weight:700;cursor:pointer;display:grid;place-items:center;box-shadow:var(--shadow-sm);transition:background .2s,transform .15s;line-height:1; }
+    .step-btn:hover{ background:var(--gold); transform:scale(1.08); }
+    .step-val{ min-width:20px; text-align:center; font-weight:700; color:var(--muted); transition:color .2s; }
+    .step-val.has-val{ color:var(--navy); }
+
+    /* karty darmowe (zwierzęta, sanitariaty) */
+    .cennik-card-free::before{ background:linear-gradient(to right,#15803d,#4ade80); transform:scaleX(1); }
+    .cennik-card-free .cennik-card-icon{ background:rgba(21,128,61,.12); color:#15803d; }
+    .cennik-free-msg{ display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+    .cennik-free-tag{ font-family:'Montserrat',sans-serif; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:#15803d; font-size:1.02rem; }
+    .cennik-free-sub{ color:var(--muted); font-size:.92rem; }
+
+    /* ---- panel kosztorysu ---- */
+    .calc-panel{ display:none; position:sticky; top:96px; }
+    #cennik.calc-mode .calc-panel{ display:block; animation:slideIn .4s var(--ease); }
+    @keyframes slideIn{ from{ opacity:0; transform:translateY(20px);} to{ opacity:1; transform:none; } }
+    .calc-panel-inner{ background:var(--navy); color:#fff; border-radius:var(--radius-lg); padding:26px; box-shadow:var(--shadow-lg); }
+    .cp-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+    .cp-head-title{ display:flex; align-items:center; gap:9px; font-family:'Montserrat',sans-serif; font-weight:700; color:#fff; font-size:1.05rem; }
+    .cp-head-title svg{ color:var(--gold); }
+    .cp-clear{ background:none; border:0; color:rgba(255,255,255,.55); font-size:.82rem; cursor:pointer; text-decoration:underline; }
+    .cp-clear:hover{ color:#fff; }
+    .cp-days{ display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,.07); border-radius:var(--radius); padding:13px 18px; margin-bottom:16px; }
+    .cp-days-lbl{ font-size:.92rem; color:rgba(255,255,255,.85); }
+    .cp-days-stepper{ display:flex; align-items:center; gap:12px; }
+    .cp-days-val{ min-width:26px; text-align:center; font-weight:700; font-size:1.1rem; }
+    .cp-days .step-btn{ background:rgba(255,255,255,.14); color:#fff; }
+    .cp-days .step-btn:hover{ background:var(--gold); color:var(--navy); }
+    .cp-discount-banner{ display:flex; align-items:center; gap:8px; background:rgba(74,222,128,.16); color:#86efac; border-radius:10px; padding:10px 14px; font-size:.84rem; font-weight:600; margin-bottom:14px; }
+    .cp-body{ min-height:56px; margin-bottom:14px; }
+    .cp-empty{ color:rgba(255,255,255,.5); font-size:.9rem; text-align:center; padding:22px 6px; line-height:1.6; }
+    .cp-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:11px 0; border-bottom:1px solid rgba(255,255,255,.1); }
+    .cp-row-name{ font-size:.92rem; font-weight:600; }
+    .cp-row-detail{ font-size:.77rem; color:rgba(255,255,255,.55); margin-top:2px; }
+    .cp-row-val{ font-family:'Montserrat',sans-serif; font-weight:700; white-space:nowrap; }
+    .cp-row-free{ color:#86efac; font-weight:700; font-size:.85rem; }
+    .cp-foot{ border-top:2px solid rgba(255,255,255,.15); padding-top:16px; }
+    .cp-total-breakdown{ font-size:.82rem; color:rgba(255,255,255,.72); margin-bottom:12px; line-height:1.55; }
+    .cp-total{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom:8px; }
+    .cp-total-lbl{ font-size:.92rem; color:rgba(255,255,255,.85); }
+    .cp-total-val{ font-family:'Montserrat',sans-serif; font-weight:800; font-size:1.9rem; color:var(--gold); }
+    .cp-foot-note{ font-size:.74rem; color:rgba(255,255,255,.5); margin-bottom:16px; line-height:1.5; }
+    .cp-cta{ width:100%; justify-content:center; }
+
+    /* ---- oferty domków ---- */
+    .domki-offers{ display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+    @media(max-width:900px){ .domki-offers{ grid-template-columns:1fr; } }
+    .domek-offer{ background:#fff; border:1px solid var(--line); border-radius:var(--radius-lg); overflow:hidden; box-shadow:var(--shadow-sm); display:flex; flex-direction:column; transition:transform .3s var(--ease), box-shadow .3s; }
+    .domek-offer:hover{ transform:translateY(-6px); box-shadow:var(--shadow-md); }
+    .domek-offer .do-media{ aspect-ratio:16/10; overflow:hidden; }
+    .domek-offer .do-media img,.domek-offer .do-media video{ width:100%;height:100%;object-fit:cover; }
+    .domek-offer .do-body{ padding:24px; display:flex; flex-direction:column; gap:6px; flex:1; }
+    .domek-offer h3{ font-size:1.12rem; font-weight:700; }
+    .domek-offer .do-sub{ color:var(--muted); font-size:.88rem; }
+    .domek-offer .do-price{ font-family:'Montserrat',sans-serif; font-weight:800; font-size:1.9rem; color:var(--navy); margin-top:8px; }
+    .domek-offer .do-price small{ font-size:.8rem; color:var(--muted); font-weight:600; }
+    .domek-cta{ margin-top:auto; padding-top:16px; }
+    .domek-add-btn{ display:none; } .calc-mode .domek-add-btn{ display:inline-flex; } .calc-mode .domek-link{ display:none; }
+    .domek-add-btn.added{ background:#15803d!important; color:#fff!important; }
+
+    /* ---- modal podsumowania ---- */
+    #inquiryModal{ display:none; position:fixed; inset:0; z-index:200; background:rgba(8,20,38,.9); align-items:center; justify-content:center; padding:24px; }
+    #inquiryModal.open{ display:flex; }
+    .inq-card{ background:#fff; border-radius:var(--radius-lg); max-width:540px; width:100%; box-shadow:var(--shadow-lg); overflow:hidden; max-height:92vh; display:flex; flex-direction:column; animation:slideIn .35s var(--ease); }
+    .inq-head{ background:var(--navy); color:#fff; display:flex; align-items:center; justify-content:space-between; padding:20px 24px; }
+    .inq-head-title{ display:flex; align-items:center; gap:10px; font-family:'Montserrat',sans-serif; font-weight:700; }
+    .inq-head-title svg{ color:var(--gold); }
+    .inq-close{ background:none;border:0;color:#fff;cursor:pointer;padding:4px; }
+    .inq-body{ padding:24px; overflow-y:auto; }
+    .inq-label{ font-size:.8rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:10px; }
+    .inq-msg{ width:100%; min-height:240px; border:1.5px solid var(--line); border-radius:var(--radius); padding:15px; font:inherit; font-size:.88rem; line-height:1.55; color:var(--text); resize:vertical; background:var(--blue-lt2); }
+    .inq-actions{ display:flex; gap:12px; flex-wrap:wrap; margin-top:14px; }
+    .inq-actions .btn{ flex:1; justify-content:center; min-width:150px; }
+    .inq-copy-btn.copied{ background:#15803d!important; color:#fff!important; border-color:#15803d!important; }
+    .inq-divider{ height:1px; background:var(--line); margin:22px 0; }
+    .inq-contact-title{ font-family:'Montserrat',sans-serif; font-weight:700; margin-bottom:12px; color:var(--navy); }
+    .inq-contact-row{ display:flex; align-items:center; gap:12px; padding:9px 0; }
+    .inq-contact-row svg{ color:var(--gold-dk); flex-shrink:0; }
+    .inq-contact-row a{ color:var(--navy); font-weight:600; }
+  </style>
+</head>
+<body>
+
+  <header class="nav">
+    <div class="container">
+      <a href="index.html" class="nav-logo"><img src="img/logo.svg" alt="Plaża Patelnia" /></a>
+      <nav><ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="atrakcje.html">Atrakcje</a></li>
+        <li><a href="domki.html">Domki</a></li>
+        <li><a href="camping.html" class="active">Camping</a></li>
+        <li><a href="koncerty.html">Koncerty i Imprezy</a></li>
+        <li><a href="bilety.html">Bilety</a></li>
+        <li><a href="kontakt.html">Kontakt</a></li>
+        <li><a href="dofinansowanie.html">Dofinansowanie</a></li>
+      </ul></nav>
+      <div class="nav-right">
+        <div class="nav-social">
+          <a href="https://www.facebook.com/PlazaPatelnia" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+          <a href="https://www.instagram.com/PlazaPatelnia/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+        </div>
+        <a href="bilety.html" class="btn btn-gold btn-sm">Kup bilety</a>
+      </div>
+      <button class="nav-burger" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </header>
+  <nav class="mobile-menu">
+    <a href="index.html">Home</a><a href="atrakcje.html">Atrakcje</a><a href="domki.html">Domki</a>
+    <a href="camping.html" class="active">Camping</a><a href="koncerty.html">Koncerty i Imprezy</a><a href="bilety.html">Bilety</a><a href="kontakt.html">Kontakt</a><a href="dofinansowanie.html">Dofinansowanie</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="page-hero">
+    <img class="bg" src="img/hero-drone-1.jpg" alt="Pole namiotowe nad jeziorem — Plaża Patelnia" />
+    <div class="ov"></div>
+    <div class="container">
+      <span class="eyebrow">Pole namiotowe &amp; kemping</span>
+      <h1>Camping nad jeziorem</h1>
+      <p>Rozbij namiot lub zaparkuj campera tuż przy plaży. Sprawdź cennik i policz koszt swojego pobytu w kilka sekund.</p>
+    </div>
+  </section>
+
+  <!-- CENNIK + KALKULATOR -->
+  <section class="section" id="cennik">
+    <div class="container">
+
+      <div class="calc-toggle-bar reveal">
+        <div class="ctb-text">
+          <h2>Cennik kempingu</h2>
+          <p>Poniżej znajdziesz pełny cennik. Włącz kalkulator, aby zsumować koszt swojego pobytu i wygenerować gotową wiadomość z zapytaniem.</p>
+        </div>
+        <button class="calc-toggle-btn" id="calcToggleBtn" onclick="toggleCalc()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="8" y2="10"/><line x1="12" y1="10" x2="12" y2="10"/><line x1="16" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="18" x2="8" y2="18"/></svg>
+          <span class="ctb-off">Włącz kalkulator</span><span class="ctb-on">Kalkulator włączony</span>
+          <span class="toggle-sw"><span class="toggle-th"></span></span>
+        </button>
+      </div>
+
+      <div class="cennik-body">
+        <div class="cennik-main">
+          <div class="cennik-grid">
+
+            <!-- Osoby -->
+            <div class="cennik-card">
+              <div class="cennik-card-top">
+                <div class="cennik-card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
+                <h3 class="cennik-card-title">Osoby</h3>
+              </div>
+              <ul class="cennik-list">
+                <li data-price="22" data-name="Osoba dorosła"><span class="item-name">Osoba dorosła</span><div class="item-right"><div class="item-stepper"><button class="step-btn" onclick="stepItem(this,-1)">−</button><span class="step-val">0</span><button class="step-btn" onclick="stepItem(this,1)">+</button></div><span class="price">22 zł</span></div></li>
+                <li data-price="0" data-name="Dziecko do 3 lat"><span class="item-name">Dziecko do 3 lat</span><div class="item-right"><div class="item-stepper"><button class="step-btn" onclick="stepItem(this,-1)">−</button><span class="step-val">0</span><button class="step-btn" onclick="stepItem(this,1)">+</button></div><span class="price free">bezpłatnie</span></div></li>
+                <li data-price="14" data-name="Dziecko 4–12 lat"><span class="item-name">Dziecko 4–12 lat</span><div class="item-right"><div class="item-stepper"><button class="step-btn" onclick="stepItem(this,-1)">−</button><span class="step-val">0</span><button class="step-btn" onclick="stepItem(this,1)">+</button></div><span class="price">14 zł</span></div></li>
+              </ul>
+            </div>
+
+            <!-- Stanowiska / namioty -->
+            <div class="cennik-card">
+              <div class="cennik-card-top">
+                <div class="cennik-card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20 L12 4 L21 20 Z"/><path d="M3 20 h18"/><path d="M12 9 L12 20"/></svg></div>
+                <h3 class="cennik-card-title">Namioty i stanowiska</h3>
+              </div>
+              <ul class="cennik-list">
+                <li data-price="20" data-name="Namiot mały (1–2 os.)"><span class="item-name">Namiot mały (1–2 os.)</span><div class="item-right"><div class="item-stepper"><button class="step-btn" onclick="stepItem(this,-1)">−</button><span class="step-val">0</span><button class="step-btn" onclick="stepItem(this,1)">+</button></div><span class="price">20 zł</span></div></li>
+                <li data-price="30" data-name="Namiot duży (3+ os.)"><span class="item-name">Namiot duży (3+ os.)</span><div class="item-right"><div class="item-stepper"><button class="step-btn" onclick="stepItem(this,-1)">−</button><span class="step-val">0</span><button class="step-btn" onclick="stepItem(this,1)">+</button></div><span class="price">30 zł</span></div></li>
+                <li data-price="45" data-name="Stanowisko pod campera/przyczepę"><span class="item-name">Stanowisko pod campera / przyczepę</span><div class="item-right"><div class="item-stepper"><button class="step-btn" onclick="stepItem(this,-1)">−</button><span class="step-val">0</span><button class="step-btn" onclick="stepItem(this,1)">+</button></div><span class="price">45 zł</span></div></li>
+              </ul>
+            </div>
+
+            <!-- Pojazdy -->
+            <div class="cennik-card">
+              <div class="cennik-card-top">
+                <div class="cennik-card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="11" width="22" height="7" rx="2"/><path d="M5 11V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v4"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg></div>
+                <h3 class="cennik-card-title">Pojazdy</h3>
+              </div>
+              <ul class="cennik-list">
+                <li data-price="15" data-name="Samochód osobowy"><span class="item-name">Samochód osobowy</span><div class="item-right"><div class="item-stepper"><button class="step-btn" onclick="stepItem(this,-1)">−</button><span class="step-val">0</span><button class="step-btn" onclick="stepItem(this,1)">+</button></div><span class="price">15 zł</span></div></li>
+                <li data-price="15" data-name="Motocykl"><span class="item-name">Motocykl</span><div class="item-right"><div class="item-stepper"><button class="step-btn" onclick="stepItem(this,-1)">−</button><span class="step-val">0</span><button class="step-btn" onclick="stepItem(this,1)">+</button></div><span class="price">15 zł</span></div></li>
+                <li data-price="35" data-name="Camper / bus"><span class="item-name">Camper / bus</span><div class="item-right"><div class="item-stepper"><button class="step-btn" onclick="stepItem(this,-1)">−</button><span class="step-val">0</span><button class="step-btn" onclick="stepItem(this,1)">+</button></div><span class="price">35 zł</span></div></li>
+              </ul>
+            </div>
+
+            <!-- Media i dodatki -->
+            <div class="cennik-card">
+              <div class="cennik-card-top">
+                <div class="cennik-card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+                <h3 class="cennik-card-title">Media i dodatki</h3>
+              </div>
+              <ul class="cennik-list">
+                <li data-price="25" data-name="Energia (prąd)"><span class="item-name">Energia (prąd)</span><div class="item-right"><div class="item-stepper"><button class="step-btn" onclick="stepItem(this,-1)">−</button><span class="step-val">0</span><button class="step-btn" onclick="stepItem(this,1)">+</button></div><span class="price">25 zł</span></div></li>
+                <li data-price="10" data-name="Przedsionek / altana"><span class="item-name">Przedsionek / altana</span><div class="item-right"><div class="item-stepper"><button class="step-btn" onclick="stepItem(this,-1)">−</button><span class="step-val">0</span><button class="step-btn" onclick="stepItem(this,1)">+</button></div><span class="price">10 zł</span></div></li>
+              </ul>
+            </div>
+
+            <!-- Zwierzęta (darmowe) -->
+            <div class="cennik-card cennik-card-free">
+              <div class="cennik-card-top">
+                <div class="cennik-card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="5.5" cy="11" r="2.2"/><circle cx="10" cy="6.5" r="2.2"/><circle cx="14" cy="6.5" r="2.2"/><circle cx="18.5" cy="11" r="2.2"/><path d="M12 12c-2.6 0-4.8 1.7-5.7 4.1-.6 1.6.6 3.2 2.3 3.2.9 0 1.7-.4 2.4-.7.6-.3 1.4-.3 2 0 .7.3 1.5.7 2.4.7 1.7 0 2.9-1.6 2.3-3.2C16.8 13.7 14.6 12 12 12z"/></svg></div>
+                <h3 class="cennik-card-title">Zwierzęta</h3>
+              </div>
+              <div class="cennik-free-msg"><span class="cennik-free-tag">Darmowe</span><span class="cennik-free-sub">Kochamy zwierzęta 🐾</span></div>
+            </div>
+
+            <!-- Sanitariaty (darmowe) -->
+            <div class="cennik-card cennik-card-free">
+              <div class="cennik-card-top">
+                <div class="cennik-card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 4 2.5 2.5"/><path d="M13.5 6.5a4.95 4.95 0 0 0-7 7"/><path d="M15 5 5 15"/><path d="M14 17v.01"/><path d="M10 16v.01"/><path d="M13 13v.01"/><path d="M16 10v.01"/><path d="M11 20v.01"/><path d="M17 14v.01"/></svg></div>
+                <h3 class="cennik-card-title">Sanitariaty</h3>
+              </div>
+              <div class="cennik-free-msg"><span class="cennik-free-tag">W cenie</span><span class="cennik-free-sub">Łazienki i prysznice bez opłat 🚿</span></div>
+            </div>
+
+          </div>
+
+          <!-- Oferty domków (dodawalne do kosztorysu) -->
+          <div style="margin-top:48px;">
+            <div class="section-head reveal" style="text-align:left; margin:0 0 28px;">
+              <span class="eyebrow">Wolisz dach nad głową?</span>
+              <h2 style="font-size:1.9rem;">Domki letniskowe premium</h2>
+              <p style="margin-top:8px;">Klimatyzowane domki dla 4–6 osób. Po włączeniu kalkulatora dodasz je do kosztorysu.</p>
+            </div>
+            <div class="domki-offers">
+              <div class="domek-offer" data-price="500" data-name="Domek 6-os. (niedz.–pt.)">
+                <div class="do-media"><video autoplay muted loop playsinline poster="img/domek.jpg"><source src="img/domki.mp4" type="video/mp4" /></video></div>
+                <div class="do-body">
+                  <h3>Domek 6-osobowy</h3>
+                  <span class="do-sub">Niedziela – piątek</span>
+                  <div class="do-price">500 <small>zł / doba</small></div>
+                  <span class="step-val" style="display:none">0</span>
+                  <div class="domek-cta">
+                    <a href="domki.html" class="btn btn-outline btn-sm domek-link">Szczegóły →</a>
+                    <button class="btn btn-gold btn-sm domek-add-btn" onclick="toggleDomek(this)">Dodaj do kosztorysu</button>
+                  </div>
+                </div>
+              </div>
+              <div class="domek-offer" data-price="750" data-name="Domek 6-os. (weekend/święta)">
+                <div class="do-media"><img src="img/galeria-3.jpg" alt="Domek — weekend" loading="lazy" /></div>
+                <div class="do-body">
+                  <h3>Domek 6-osobowy</h3>
+                  <span class="do-sub">Weekendy i święta</span>
+                  <div class="do-price">750 <small>zł / doba</small></div>
+                  <span class="step-val" style="display:none">0</span>
+                  <div class="domek-cta">
+                    <a href="domki.html" class="btn btn-outline btn-sm domek-link">Szczegóły →</a>
+                    <button class="btn btn-gold btn-sm domek-add-btn" onclick="toggleDomek(this)">Dodaj do kosztorysu</button>
+                  </div>
+                </div>
+              </div>
+              <div class="domek-offer" data-price="600" data-name="Domek 6-os. (weekend, min 2 doby)">
+                <div class="do-media"><img src="img/galeria-2.jpg" alt="Domek — weekend min 2 doby" loading="lazy" /></div>
+                <div class="do-body">
+                  <h3>Domek 6-osobowy</h3>
+                  <span class="do-sub">Weekendy i święta — min. 2 doby</span>
+                  <div class="do-price">600 <small>zł / doba</small></div>
+                  <span class="step-val" style="display:none">0</span>
+                  <div class="domek-cta">
+                    <a href="domki.html" class="btn btn-outline btn-sm domek-link">Szczegóły →</a>
+                    <button class="btn btn-gold btn-sm domek-add-btn" onclick="toggleDomek(this)">Dodaj do kosztorysu</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /cennik-main -->
+
+        <!-- Panel kosztorysu -->
+        <aside class="calc-panel">
+          <div class="calc-panel-inner">
+            <div class="cp-head">
+              <div class="cp-head-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/></svg>
+                Twój kosztorys
+              </div>
+              <button class="cp-clear" onclick="clearCalc()">Wyczyść</button>
+            </div>
+            <div class="cp-days">
+              <span class="cp-days-lbl">Liczba dób</span>
+              <div class="cp-days-stepper">
+                <button class="step-btn" onclick="stepDays(-1)">−</button>
+                <span class="cp-days-val" id="cpDaysVal">1</span>
+                <button class="step-btn" onclick="stepDays(1)">+</button>
+              </div>
+            </div>
+            <div class="cp-discount-banner" id="cpDiscountBanner" style="display:none;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Zniżka 5% — pobyt powyżej 7 dób
+            </div>
+            <div class="cp-body" id="cpBody">
+              <div class="cp-empty">Wybierz pozycje z cennika,<br>aby zobaczyć szacunkowy koszt.</div>
+            </div>
+            <div class="cp-foot">
+              <div class="cp-total-breakdown" id="cpBreakdown" style="display:none;"></div>
+              <div class="cp-total">
+                <span class="cp-total-lbl" id="cpTotalLbl">Łącznie / dobę</span>
+                <span class="cp-total-val" id="cpTotal">0 zł</span>
+              </div>
+              <p class="cp-foot-note">* Koszt orientacyjny. Ostateczną cenę i dostępność potwierdza obsługa ośrodka.</p>
+              <button class="btn btn-gold cp-cta" onclick="openSummary()">
+                Przejdź do podsumowania
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </button>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- PARTNERZY -->
+  <section class="partners">
+    <div class="container">
+      <h4>Partnerzy</h4>
+      <div class="partners-row reveal">
+        <img src="img/partner-orlen.svg" alt="Orlen" />
+        <img src="img/partner-cocacola.svg" alt="Coca-Cola" />
+        <img src="img/partner-sanepid.png" alt="PSSE Płock" />
+        <img src="img/partner-flaga.svg" alt="Błękitna Flaga" />
+        <img src="img/partner-nadlesnictwo.png" alt="Nadleśnictwo Łąck" />
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-logo"><img src="img/logo.svg" alt="Plaża Patelnia" /></div>
+      <nav class="footer-nav">
+        <a href="index.html">Home</a><a href="atrakcje.html">Atrakcje</a><a href="domki.html">Domki</a><a href="camping.html">Camping</a>
+        <a href="koncerty.html">Koncerty i Imprezy</a><a href="bilety.html">Bilety</a><a href="kontakt.html">Kontakt</a><a href="dofinansowanie.html">Dofinansowanie</a>
+      </nav>
+      <div class="footer-sub"><a href="dofinansowanie.html">Oświadczenie 16–17 lat</a><a href="dofinansowanie.html">Oświadczenie poniżej 16 lat</a></div>
+      <div class="footer-funding"><img src="img/kpo.png" alt="KPO / Rzeczpospolita Polska / UE NextGenerationEU" /></div>
+      <div class="footer-social">
+        <a href="https://www.facebook.com/PlazaPatelnia" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+        <a href="https://www.instagram.com/PlazaPatelnia/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+      </div>
+      <p class="footer-copy">Wszelkie prawa zastrzeżone © Plaża Patelnia 2024</p>
+    </div>
+  </footer>
+
+  <!-- MODAL PODSUMOWANIA -->
+  <div id="inquiryModal" onclick="if(event.target===this)closeModal()">
+    <div class="inq-card">
+      <div class="inq-head">
+        <div class="inq-head-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Podsumowanie i zapytanie
+        </div>
+        <button class="inq-close" onclick="closeModal()" aria-label="Zamknij"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <div class="inq-body">
+        <div class="inq-label">Gotowa wiadomość do właściciela — wyślij lub skopiuj</div>
+        <textarea class="inq-msg" id="inqMsg" readonly></textarea>
+        <div class="inq-actions">
+          <button class="btn btn-navy inq-copy-btn" id="inqCopyBtn" onclick="copyMessage()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Kopiuj
+          </button>
+          <a class="btn btn-gold" id="inqMailBtn" href="#">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            Wyślij e-mailem
+          </a>
+        </div>
+        <div class="inq-divider"></div>
+        <div class="inq-contact-title">Lub skontaktuj się bezpośrednio</div>
+        <div class="inq-contact-row"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg><a href="tel:+48508508991">+48 508 508 991</a></div>
+        <div class="inq-contact-row"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><a href="mailto:plazapatelnia@gmail.com">plazapatelnia@gmail.com</a></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    let calcActive = false, calcDays = 1;
+
+    function toggleCalc(){
+      calcActive = !calcActive;
+      document.getElementById('calcToggleBtn').classList.toggle('active', calcActive);
+      document.getElementById('cennik').classList.toggle('calc-mode', calcActive);
+      if(!calcActive) clearCalc(true);
+      else { document.querySelector('.calc-panel').scrollIntoView({behavior:'smooth', block:'nearest'}); }
+      renderCalc();
+    }
+
+    function stepItem(btn, delta){
+      const sv = btn.closest('.item-stepper').querySelector('.step-val');
+      let v = Math.max(0, (parseInt(sv.textContent)||0) + delta);
+      sv.textContent = v; sv.classList.toggle('has-val', v>0);
+      renderCalc();
+    }
+    function toggleDomek(btn){
+      const card = btn.closest('[data-price]');
+      const sv = card.querySelector('.step-val');
+      const on = (parseInt(sv.textContent)||0) === 0;
+      sv.textContent = on ? 1 : 0;
+      btn.classList.toggle('added', on);
+      btn.textContent = on ? '✓ Dodano' : 'Dodaj do kosztorysu';
+      renderCalc();
+    }
+    function stepDays(d){ calcDays = Math.max(1, calcDays + d); document.getElementById('cpDaysVal').textContent = calcDays; renderCalc(); }
+
+    function clearCalc(skipRender){
+      document.querySelectorAll('#cennik .step-val').forEach(el=>{ el.textContent='0'; el.classList.remove('has-val'); });
+      document.querySelectorAll('.domek-add-btn').forEach(b=>{ b.classList.remove('added'); b.textContent='Dodaj do kosztorysu'; });
+      calcDays = 1; document.getElementById('cpDaysVal').textContent = '1';
+      if(!skipRender) renderCalc();
+    }
+
+    function collect(){
+      let perDay = 0; const rows = [];
+      document.querySelectorAll('#cennik [data-price]').forEach(el=>{
+        const price = parseInt(el.dataset.price)||0;
+        const qty = parseInt(el.querySelector('.step-val').textContent)||0;
+        if(qty>0){ perDay += price*qty; rows.push({name:el.dataset.name, qty, price, sub:price*qty}); }
+      });
+      const hasDiscount = calcDays >= 7;
+      const gross = perDay * calcDays;
+      const discount = hasDiscount ? Math.round(gross*0.05) : 0;
+      const total = gross - discount;
+      return {perDay, rows, hasDiscount, gross, discount, total};
+    }
+
+    function renderCalc(){
+      const {perDay, rows, hasDiscount, gross, discount, total} = collect();
+      const body = document.getElementById('cpBody');
+      document.getElementById('cpDiscountBanner').style.display = hasDiscount ? 'flex' : 'none';
+      if(rows.length === 0){
+        body.innerHTML = '<div class="cp-empty">Wybierz pozycje z cennika,<br>aby zobaczyć szacunkowy koszt.</div>';
+      } else {
+        body.innerHTML = rows.map(r=>`
+          <div class="cp-row">
+            <div><div class="cp-row-name">${r.name}</div><div class="cp-row-detail">${r.qty} × ${r.price===0?'bezpłatnie':r.price+' zł / doba'}</div></div>
+            ${r.price===0 ? '<span class="cp-row-free">bezpłatnie</span>' : '<span class="cp-row-val">'+r.sub+' zł</span>'}
+          </div>`).join('');
+      }
+      const bd = document.getElementById('cpBreakdown');
+      const lbl = document.getElementById('cpTotalLbl');
+      if(calcDays > 1 && perDay > 0){
+        let t = perDay+' zł/dobę × '+calcDays+' dób = '+gross+' zł';
+        if(hasDiscount) t += '<br><span style="color:#86efac;font-weight:700;">− '+discount+' zł (zniżka 5%)</span>';
+        bd.innerHTML = t; bd.style.display = 'block';
+        lbl.textContent = 'Łącznie za '+calcDays+' dób';
+      } else {
+        bd.style.display = 'none';
+        lbl.textContent = 'Łącznie / dobę';
+      }
+      document.getElementById('cpTotal').textContent = total + ' zł';
+    }
+
+    function buildMessage(){
+      const {perDay, rows, hasDiscount, gross, discount, total} = collect();
+      let m = 'Dzień dobry,\n\nJestem zainteresowany/zainteresowana rezerwacją pobytu na Plaży Patelnia (Grabina k. Płocka).\n\n';
+      m += 'Mój kosztorys:\n';
+      m += '• Liczba dób: ' + calcDays + '\n';
+      if(rows.length === 0){ m += '• (nie wybrano jeszcze pozycji)\n'; }
+      rows.forEach(r=>{
+        m += r.price===0
+          ? '• '+r.name+': '+r.qty+' szt. (bezpłatnie)\n'
+          : '• '+r.name+': '+r.qty+' × '+r.price+' zł = '+r.sub+' zł / doba\n';
+      });
+      if(calcDays > 1 && perDay > 0){
+        m += '\nKoszt za dobę: '+perDay+' zł\n';
+        m += 'Łącznie za '+calcDays+' dób: '+gross+' zł\n';
+      }
+      if(hasDiscount) m += 'Zniżka 5% (pobyt 7+ dób): −'+discount+' zł\n';
+      m += 'Szacunkowo do zapłaty: '+total+' zł\n';
+      m += '\nProszę o potwierdzenie dostępności i szczegóły rezerwacji.\n\nPozdrawiam';
+      return m;
+    }
+
+    function openSummary(){
+      const msg = buildMessage();
+      document.getElementById('inqMsg').value = msg;
+      document.getElementById('inqMailBtn').href =
+        'mailto:plazapatelnia@gmail.com?subject=' + encodeURIComponent('Zapytanie o rezerwację — Camping Plaża Patelnia')
+        + '&body=' + encodeURIComponent(msg);
+      const btn = document.getElementById('inqCopyBtn');
+      btn.classList.remove('copied');
+      btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Kopiuj';
+      document.getElementById('inquiryModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal(){ document.getElementById('inquiryModal').classList.remove('open'); document.body.style.overflow=''; }
+    function copyMessage(){
+      const ta = document.getElementById('inqMsg');
+      navigator.clipboard.writeText(ta.value).catch(()=>{ ta.select(); document.execCommand('copy'); });
+      const btn = document.getElementById('inqCopyBtn');
+      btn.classList.add('copied');
+      btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Skopiowano!';
+      setTimeout(()=>{ btn.classList.remove('copied'); btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Kopiuj'; }, 2500);
+    }
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+  </script>
+</body>
+</html>
