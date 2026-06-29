@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kontakt — Plaża Patelnia | Płazowa 2, 09-520 Łąck</title>
+  <meta name="description" content="Skontaktuj się z Plażą Patelnia: Płazowa 2, 09-520 Łąck, tel. +48 508 508 991, plazapatelnia@gmail.com. Godziny otwarcia, kąpielisko i parking." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <header class="nav">
+    <div class="container">
+      <a href="index.html" class="nav-logo"><img src="img/logo.svg" alt="Plaża Patelnia" /></a>
+      <nav><ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="atrakcje.html">Atrakcje</a></li>
+        <li><a href="domki.html">Domki</a></li>
+        <li><a href="koncerty.html">Koncerty i Imprezy</a></li>
+        <li><a href="bilety.html">Bilety</a></li>
+        <li><a href="kontakt.html" class="active">Kontakt</a></li>
+        <li><a href="dofinansowanie.html">Dofinansowanie</a></li>
+      </ul></nav>
+      <div class="nav-right">
+        <div class="nav-social">
+          <a href="https://www.facebook.com/PlazaPatelnia" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+          <a href="https://www.instagram.com/PlazaPatelnia/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+        </div>
+        <a href="bilety.html" class="btn btn-gold btn-sm">Kup bilety</a>
+      </div>
+      <button class="nav-burger" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </header>
+  <nav class="mobile-menu">
+    <a href="index.html">Home</a><a href="atrakcje.html">Atrakcje</a><a href="domki.html">Domki</a>
+    <a href="koncerty.html">Koncerty i Imprezy</a><a href="bilety.html">Bilety</a><a href="kontakt.html" class="active">Kontakt</a><a href="dofinansowanie.html">Dofinansowanie</a>
+  </nav>
+
+  <section class="page-hero">
+    <img class="bg" src="img/altana.jpg" alt="Altana i taras Plaży Patelnia" />
+    <div class="ov"></div>
+    <div class="container">
+      <span class="eyebrow">Kontakt</span>
+      <h1>Kontakt z nami</h1>
+      <p>Plaża Patelnia i kąpielisko z tytułem Błękitnej Flagi w 2024 roku.</p>
+    </div>
+  </section>
+
+  <section class="section contact-dark">
+    <div class="container">
+      <div class="contact-grid">
+        <div class="contact-info reveal">
+          <div class="ci-block">
+            <div class="ci-label">Adres</div>
+            <p class="big">Plaża Patelnia — Grabina</p>
+            <p>Płazowa 2, 09-520 Łąck</p>
+          </div>
+          <div class="ci-block">
+            <div class="ci-label">Telefon</div>
+            <p class="big"><a href="tel:+48508508991">+48 508 508 991</a></p>
+          </div>
+          <div class="ci-block">
+            <div class="ci-label">E-mail</div>
+            <p><a href="mailto:plazapatelnia@gmail.com">plazapatelnia@gmail.com</a></p>
+          </div>
+        </div>
+        <div class="map-modern reveal d1" data-dest="Plaża Patelnia, Płazowa 2, 09-520 Łąck">
+          <div class="map-frame">
+            <div class="map-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Plaża Patelnia · Łąck</div>
+            <iframe src="https://maps.google.com/maps?q=Pla%C5%BCa%20Patelnia%20P%C5%82azowa%202%20%C5%81%C4%85ck&z=14&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Mapa — Plaża Patelnia"></iframe>
+          </div>
+          <div class="map-panel">
+            <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>Dojazd i nawigacja</h3>
+            <p class="mp-addr">Płazowa 2, 09-520 Łąck — oblicz czas i trasę dojazdu.</p>
+            <form class="route-form">
+              <input type="text" placeholder="Skąd jedziesz? np. Warszawa" aria-label="Punkt startowy" />
+              <button type="submit" class="btn btn-gold">Wyznacz trasę →</button>
+            </form>
+            <div class="route-quick">
+              <span class="rq-label">Szybko z:</span>
+              <button type="button" data-from="Płock">Płock</button>
+              <button type="button" data-from="Warszawa">Warszawa</button>
+              <button type="button" data-from="Łódź">Łódź</button>
+              <button type="button" data-from="Gostynin">Gostynin</button>
+            </div>
+            <div class="route-result"></div>
+            <div class="map-actions">
+              <a class="btn btn-navy" data-nav target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>Uruchom nawigację</a>
+              <a class="btn btn-outline" data-open target="_blank" rel="noopener">Otwórz w Google Maps</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-cards">
+        <div class="info-card reveal">
+          <div class="ic-head">
+            <span class="ic-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg></span>
+            <h3>Godziny otwarcia obiektu</h3>
+          </div>
+          <div class="info-rows">
+            <div class="ir"><span class="k">Śniadania</span><span class="v">09:00 – 12:00</span></div>
+            <div class="ir"><span class="k">Poniedziałek</span><span class="v">12:00 – 21:00</span></div>
+            <div class="ir"><span class="k">Wtorek</span><span class="v">12:00 – 21:00</span></div>
+            <div class="ir"><span class="k">Środa</span><span class="v">12:00 – 21:00</span></div>
+            <div class="ir"><span class="k">Czwartek</span><span class="v">12:00 – 21:00</span></div>
+            <div class="ir"><span class="k">Piątek</span><span class="v">9:00 – 21:00</span></div>
+            <div class="ir"><span class="k">Sobota</span><span class="v">9:00 – 21:00</span></div>
+            <div class="ir"><span class="k">Niedziela</span><span class="v">9:00 – 21:00</span></div>
+          </div>
+        </div>
+
+        <div class="info-card reveal d1">
+          <div class="ic-head">
+            <span class="ic-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 16c1.5 0 1.5 1.5 3 1.5S8 16 9.5 16s1.5 1.5 3 1.5S14 16 15.5 16s1.5 1.5 3 1.5S20 16 21.5 16"/><path d="M2 20c1.5 0 1.5 1.5 3 1.5S8 20 9.5 20s1.5 1.5 3 1.5S14 20 15.5 20s1.5 1.5 3 1.5S20 20 21.5 20"/><circle cx="9" cy="6" r="2"/><path d="M11 8l5 4"/></svg></span>
+            <h3>Strzeżone kąpielisko</h3>
+          </div>
+          <span class="ic-season">Ratownicy · 27.06 – 31.08.2026</span>
+          <div class="info-rows">
+            <div class="ir"><span class="k">Poniedziałek – czwartek</span><span class="v free">bezpłatne</span></div>
+            <div class="ir"><span class="k">Piątek – niedziela</span><span class="v">10 zł / os. / dzień</span></div>
+            <div class="ir"><span class="k">Dzieci do lat 6</span><span class="v free">bezpłatnie</span></div>
+          </div>
+        </div>
+
+        <div class="info-card reveal d2">
+          <div class="ic-head">
+            <span class="ic-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/></svg></span>
+            <h3>Parking</h3>
+          </div>
+          <div class="info-rows">
+            <div class="ir"><span class="k">W ciągu dnia (codziennie)</span><span class="v">10 zł / pojazd / dzień</span></div>
+            <div class="ir"><span class="k">Podczas wieczornych imprez</span><span class="v free">bezpłatny</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="partners">
+    <div class="container">
+      <h4>Partnerzy</h4>
+      <div class="partners-row reveal">
+        <img src="img/partner-orlen.svg" alt="Orlen" />
+        <img src="img/partner-cocacola.svg" alt="Coca-Cola" />
+        <img src="img/partner-sanepid.png" alt="PSSE Płock" />
+        <img src="img/partner-flaga.svg" alt="Błękitna Flaga" />
+        <img src="img/partner-nadlesnictwo.png" alt="Nadleśnictwo Łąck" />
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-logo"><img src="img/logo.svg" alt="Plaża Patelnia" /></div>
+      <nav class="footer-nav">
+        <a href="index.html">Home</a><a href="atrakcje.html">Atrakcje</a><a href="domki.html">Domki</a>
+        <a href="koncerty.html">Koncerty i Imprezy</a><a href="bilety.html">Bilety</a><a href="kontakt.html">Kontakt</a><a href="dofinansowanie.html">Dofinansowanie</a>
+      </nav>
+      <div class="footer-sub"><a href="dofinansowanie.html">Oświadczenie 16–17 lat</a><a href="dofinansowanie.html">Oświadczenie poniżej 16 lat</a></div>
+      <div class="footer-funding"><img src="img/kpo.png" alt="KPO / Rzeczpospolita Polska / UE NextGenerationEU" /></div>
+      <div class="footer-social">
+        <a href="https://www.facebook.com/PlazaPatelnia" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+        <a href="https://www.instagram.com/PlazaPatelnia/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+      </div>
+      <p class="footer-copy">Wszelkie prawa zastrzeżone © Plaża Patelnia 2024</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
